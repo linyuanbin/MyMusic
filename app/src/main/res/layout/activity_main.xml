@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <TextView
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="音乐播放器" />
+
+    <!-- android:text="yiwannian.mp3"-->
+    <EditText
+        android:id="@+id/filename"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/playbutton"
+            android:text="播放"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="mediaplay"/>
+
+        <Button
+            android:id="@+id/pausebutton"
+            android:text="暂停"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="mediaplay"/>
+
+        <Button
+            android:id="@+id/resetbutton"
+            android:text="重播"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="mediaplay"/>
+
+        <Button
+            android:id="@+id/stopbutton"
+            android:text="停止"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="mediaplay"/>
+
+
+    </LinearLayout>
+
+    <Button
+        android:text="下一首"
+        android:onClick="next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <Button
+        android:text="上一首"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+</LinearLayout>
