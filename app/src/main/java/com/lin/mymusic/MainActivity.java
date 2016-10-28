@@ -18,6 +18,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //Tools--> android-->Device monitor  音乐文件放入sd卡
 public class MainActivity extends AppCompatActivity {
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean pause; //标记是否暂停
     private int position;//用于记录播放进度
     private List<String> list;
+    private String[] strings;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,7 +44,42 @@ public class MainActivity extends AppCompatActivity {
         TelephonyManager telephonyManager= (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);  //监听电话
         telephonyManager.listen(new MyPhoneListener(), PhoneStateListener.LISTEN_CALL_STATE);
 
-      //  search();
+
+        File[] file = Environment.getExternalStorageDirectory().listFiles();
+        if(file!=null) {
+            for (int i=0;i<file.length;i++) {
+                String s = file[i].getAbsolutePath();
+                if(s.toLowerCase().endsWith(".mp3")){  //检索得到MP3文件
+                list.add(s);
+                }
+            }
+            for(int j=0;j<list.size();j++){
+
+              /*  if(list.get(j).endsWith("mp3")){
+                    strings[j]=list.get(j);
+                }*/
+                Log.i("------>",list.get(j));
+
+
+            }
+        }
+
+    }
+
+
+    public void search(){
+        File[] filename=Environment.getExternalStorageDirectory().listFiles();
+        String []even={".mp3"};
+        for(int i=0;i<filename.length;i++) {
+            //if (filename[i].exists()) { //文件找到存在
+            String s = filename[i].getAbsolutePath();
+            if (s.toLowerCase().endsWith(".mp3")) {
+                list.add(s);//的到所有文件包括  .mo3wenjain
+                p++;
+            }
+             // Log.i("-------->",list.get(i));
+
+        }
 
     }
 
@@ -103,15 +141,16 @@ public class MainActivity extends AppCompatActivity {
     public void mediaplay(View view) {
         switch (view.getId()){
             case R.id.playbutton:
-                String filename=mEditText.getText().toString();//得到文件名
-                File audio=new File(Environment.getExternalStorageDirectory(),filename);
-                if(audio.exists()){ //发现文件
-                    path=audio.getAbsolutePath();//获得绝对路径
+               // String filename=mEditText.getText().toString();//得到文件名
+             //   File audio=new File(Environment.getExternalStorageDirectory(),filename);
+              //  if(audio.exists()){ //发现文件
+                //    path=audio.getAbsolutePath();//获得绝对路径
+                path=list.get(p);
                     play();//播放
-                }else{
-                    path=null;
-                    Toast.makeText(MainActivity.this,"sorry the file inexistence !",Toast.LENGTH_SHORT).show();
-                }
+                //}else{
+                    //path=null;
+                //    Toast.makeText(MainActivity.this,"sorry the file inexistence !",Toast.LENGTH_SHORT).show();
+                //}
             break;
             case R.id.pausebutton: //暂停
                     if(mMediaPlayer.isPlaying()){
@@ -170,35 +209,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void search(){
-        File[] filename=Environment.getExternalStorageDirectory().listFiles();
-        String []even={".mp3"};
-        for(int i=0;i<filename.length;i++){
-            String s=filename[i].getAbsolutePath();
-            if(s.endsWith(even[i])) {
-                list.add(s);//的到所有文件包括  .mo3wenjain
-            }
-        //    Log.i("-------->",list.get(i));
-        }
 
-    }
 
-    public void next(View v){
-
-        String str[]={"music.mp3","AlwaysOnline.mp3","yiwannian.mp3"};
-       // String str[]={};
-     /*   for(int j=p;j<list.size();j++){
-            str[p++]=list.get(j);
-        }*/
+    public void next(View v){ //
+        /*
+        String str[]={"music.mp3","AlwaysOnline.mp3","yiwannian.mp3","turanleil.mp3","qidaiai.mp3","jianjiandandan.mp3"};
             mEditText.setText(str[p]);
             //File file=new File(Environment.getExternalStorageDirectory(),str[p]);
-        File file=new File(Environment.getExternalStorageDirectory(),str[p]);
+          File file=new File(Environment.getExternalStorageDirectory(),str[p]);
             if(file.exists()){ //发现文件
                 path=file.getAbsolutePath();//获得绝对路径
                 play();
         }
+        */
+        path=list.get(p);
+        play();
+        mEditText.setText(list.get(p));
         p++;
-        if(p==2) p=0;
+        if(p==list.size()) p=0;
     }
 /*
     public void up(View v) {
