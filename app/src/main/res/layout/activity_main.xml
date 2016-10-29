@@ -15,7 +15,7 @@
     <!-- android:text="yiwannian.mp3"-->
     <EditText
         android:id="@+id/filename"
-
+        android:maxLines="1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -55,15 +55,27 @@
 
     </LinearLayout>
 
+    <android.support.v7.widget.AppCompatSeekBar
+        android:id="@+id/seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
     <Button
         android:text="下一首"
         android:onClick="next"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
     <Button
         android:text="上一首"
+        android:onClick="up"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    </LinearLayout>
 
 </LinearLayout>

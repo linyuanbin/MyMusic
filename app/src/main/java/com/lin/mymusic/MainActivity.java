@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.Environment;
 //import android.support.v4.widget.SearchViewCompatIcs;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.PhoneStateListener;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import java.io.File;
@@ -22,16 +24,33 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 //Tools--> android-->Device monitor  音乐文件放入sd卡
+/*
+播放音乐方法为：start();
+
+停止音乐播放的方法为：stop();
+
+控制音乐播放位置为：seekTo(int value);
+
+获得音乐长度为：getDuration();
+
+获得现在播放的位置：getCurrentPosition();
+
+ // 设置音乐播放完的监听
+    mediaPlayer.setOnCompletionListener(this);
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static int p=0;
     private EditText mEditText;
+    private SeekBar mSeekBar;
     private String path;
     private MediaPlayer mMediaPlayer;//多媒体播放类
     private boolean pause; //标记是否暂停
     private int position;//用于记录播放进度
     private List<String> list;
     private String[] strings;
+ /*   private  Handler handler;
+    private Runnable updateThread;*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,47 +59,88 @@ public class MainActivity extends AppCompatActivity {
         list=new ArrayList<>();
         mMediaPlayer=new MediaPlayer();
         mEditText= (EditText) findViewById(R.id.filename);
+        mSeekBar= (SeekBar) findViewById(R.id.seekbar);
+//        mSeekBar.setMax(mMediaPlayer.getDuration());//获取歌曲长度做为进度条最大值
 
         TelephonyManager telephonyManager= (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);  //监听电话
         telephonyManager.listen(new MyPhoneListener(), PhoneStateListener.LISTEN_CALL_STATE);
 
+        search();
+        init();
 
-        File[] file = Environment.getExternalStorageDirectory().listFiles();
-        if(file!=null) {
-            for (int i=0;i<file.length;i++) {
-                String s = file[i].getAbsolutePath();
-                if(s.toLowerCase().endsWith(".mp3")){  //检索得到MP3文件
-                list.add(s);
-                }
+
+/*
+        handler = new Handler();
+        updateThread = new Runnable(){
+            public void run() {
+                //获得歌曲现在播放位置并设置成播放进度条的值
+                mSeekBar.setProgress(mMediaPlayer.getCurrentPosition());
+                //每次延迟100毫秒再启动线程
+                // handler.postDelayed(updateThread, 100);
             }
-            for(int j=0;j<list.size();j++){
+        };*/
 
-              /*  if(list.get(j).endsWith("mp3")){
-                    strings[j]=list.get(j);
-                }*/
-                Log.i("------>",list.get(j));
-
-
-            }
-        }
 
     }
 
 
-    public void search(){
-        File[] filename=Environment.getExternalStorageDirectory().listFiles();
-        String []even={".mp3"};
-        for(int i=0;i<filename.length;i++) {
-            //if (filename[i].exists()) { //文件找到存在
-            String s = filename[i].getAbsolutePath();
-            if (s.toLowerCase().endsWith(".mp3")) {
-                list.add(s);//的到所有文件包括  .mo3wenjain
-                p++;
-            }
-             // Log.i("-------->",list.get(i));
-
+    Handler handler = new Handler();
+    Runnable updateThread = new Runnable(){
+        public void run() {
+            //获得歌曲现在播放位置并设置成播放进度条的值
+            mSeekBar.setProgress(mMediaPlayer.getCurrentPosition());
+            //每次延迟100毫秒再启动线程
+            handler.postDelayed(updateThread, 100);
         }
+    };
 
+
+
+    private void init(){
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {  //seekBar进度监听
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress,boolean fromUser) {
+                // fromUser判断是用户改变的滑块的值
+                if (fromUser == true) {
+                    position=progress;
+                    int po=mSeekBar.getProgress();
+                   // int p=(po/mSeekBar.getMax())*mMediaPlayer.getDuration();
+                    mMediaPlayer.seekTo(po);
+
+                }
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) { //拖动结束调用
+                seekBar.setProgress(seekBar.getProgress());
+
+                int test=seekBar.getProgress();
+
+                int max=mMediaPlayer.getDuration();// 歌曲进度的最大值
+
+                mMediaPlayer.seekTo((int)(max*(seekBar.getProgress()/(double)seekBar.getMax())));
+            }
+        });  //seekBar监听结束
+    }//init
+
+
+    public void search(){
+
+        File[] file = Environment.getExternalStorageDirectory().listFiles();  //获取sd0卡目录所有文件
+        if(file!=null) {
+            for (int i=0;i<file.length;i++) {
+                String s = file[i].getAbsolutePath();
+                if(s.toLowerCase().endsWith(".mp3")){  //检索得到MP3文件
+                    list.add(s);
+                }
+            }
+
+            for(int j=0;j<list.size();j++){
+                Log.i("------>",list.get(j));
+            }
+        }
     }
 
     private final class MyPhoneListener extends PhoneStateListener{
@@ -129,8 +189,6 @@ public class MainActivity extends AppCompatActivity {
 */
 
 
-
-
     @Override
     protected void onDestroy() {
         mMediaPlayer.release();  //摧毁播放类对象
@@ -174,7 +232,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 break;
-
             case R.id.stopbutton:
                 if(mMediaPlayer.isPlaying()){
                     mMediaPlayer.stop();//停止播放
@@ -185,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void play() {  //自定义播放函数
-        mMediaPlayer.reset();//把各项参数恢复到初始状态//以便后面的
+        mMediaPlayer.reset();//把各项参数恢复到初始状态
         try {
             mMediaPlayer.setDataSource(path);//设置路径
             mMediaPlayer.prepare();//缓冲
@@ -211,43 +268,19 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void next(View v){ //
-        /*
-        String str[]={"music.mp3","AlwaysOnline.mp3","yiwannian.mp3","turanleil.mp3","qidaiai.mp3","jianjiandandan.mp3"};
-            mEditText.setText(str[p]);
-            //File file=new File(Environment.getExternalStorageDirectory(),str[p]);
-          File file=new File(Environment.getExternalStorageDirectory(),str[p]);
-            if(file.exists()){ //发现文件
-                path=file.getAbsolutePath();//获得绝对路径
-                play();
-        }
-        */
-        path=list.get(p);
+    public void next(View v){
+        if(p==(list.size()-1)) p=0;
+        path=list.get(++p);
         play();
         mEditText.setText(list.get(p));
-        p++;
-        if(p==list.size()) p=0;
     }
-/*
+
     public void up(View v) {
-        String str[] = {"music.mp3", "AlwaysOnline.mp3", "yiwannian.mp3"};
-        //mEditText.setText(str[p]);
-        if (p > 0) {
-            File file = new File(Environment.getExternalStorageDirectory(), str[p - 1]);
-            if (file.exists()) { //发现文件
-                path = file.getAbsolutePath();//获得绝对路径
-                play();
-            }
-        } else {
-            File file = new File(Environment.getExternalStorageDirectory(), str[2]);
-            if (file.exists()) { //发现文件
-                path = file.getAbsolutePath();//获得绝对路径
-                play();
-            }
-            p++;
-            if (p == 2) p = 0;
-        }
+        if(p==0) p=list.size();
+        path=list.get(--p);
+        play();
+        mEditText.setText(list.get(p));
     }
-*/
+
 
 }
