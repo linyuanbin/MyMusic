@@ -69,8 +69,9 @@ public class MainActivity extends AppCompatActivity {
         init();
 
 
-/*
-        handler = new Handler();
+
+
+ /*       handler = new Handler();
         updateThread = new Runnable(){
             public void run() {
                 //获得歌曲现在播放位置并设置成播放进度条的值
@@ -78,17 +79,18 @@ public class MainActivity extends AppCompatActivity {
                 //每次延迟100毫秒再启动线程
                 // handler.postDelayed(updateThread, 100);
             }
-        };*/
+        };
+*/
+
+    } //onCreate
 
 
-    }
-
-
-    Handler handler = new Handler();
+    Handler handler = new Handler(); //多线程
     Runnable updateThread = new Runnable(){
         public void run() {
             //获得歌曲现在播放位置并设置成播放进度条的值
-            mSeekBar.setProgress(mMediaPlayer.getCurrentPosition());
+            int max=mSeekBar.getMax();
+            mSeekBar.setProgress((int)(max*(mMediaPlayer.getCurrentPosition()/(float) mMediaPlayer.getDuration())));
             //每次延迟100毫秒再启动线程
             handler.postDelayed(updateThread, 100);
         }
@@ -205,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 //    path=audio.getAbsolutePath();//获得绝对路径
                 path=list.get(p);
                     play();//播放
+                    handler.post(updateThread);//启动线程
                 //}else{
                     //path=null;
                 //    Toast.makeText(MainActivity.this,"sorry the file inexistence !",Toast.LENGTH_SHORT).show();
