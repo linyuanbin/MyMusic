@@ -5,13 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+<include layout="@layout/item"/>
 
+<!--
     <TextView
         android:layout_gravity="center"
         android:textColor="#ff55"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="音乐播放器" />
+        android:text="音乐播放器" />-->
 
     <!-- android:text="yiwannian.mp3"-->
    <!-- <EditText
@@ -23,7 +25,7 @@
     <AdapterViewFlipper
         android:layout_gravity="center"
         android:id="@+id/adapterviewflipper"
-        android:layout_width="300dp"
+        android:layout_width="match_parent"
         android:flipInterval="5000"
         android:layout_height="300dp">
 
@@ -38,6 +40,7 @@
         android:ellipsize="marquee"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -132,7 +135,18 @@
             android:layout_height="wrap_content"
             android:onClick="mediaplay"/>
 
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner"
+            android:layout_centerHorizontal="true" />
 
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_name"
+        android:text="huhau"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>
