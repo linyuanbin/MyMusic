@@ -2,9 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
+    android:background="@drawable/blueback"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!--自定义标签栏-->
 <include layout="@layout/item"/>
 
 <!--
@@ -25,7 +27,8 @@
     <AdapterViewFlipper
         android:layout_gravity="center"
         android:id="@+id/adapterviewflipper"
-        android:layout_width="match_parent"
+        android:layout_marginTop="10dp"
+        android:layout_width="300dp"
         android:flipInterval="5000"
         android:layout_height="300dp">
 
@@ -50,6 +53,25 @@
         android:id="@+id/seekbar"
         android:layout_width="300dp"
         android:layout_height="wrap_content" />
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/starTime"
+            android:paddingLeft="20dp"
+            android:layout_gravity="start"
+            android:gravity="start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/stopTime"
+            android:paddingLeft="260dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -136,17 +158,12 @@
             android:onClick="mediaplay"/>
 
         <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:id="@+id/spinner"
             android:layout_centerHorizontal="true" />
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/text_name"
-        android:text="huhau"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
 </LinearLayout>

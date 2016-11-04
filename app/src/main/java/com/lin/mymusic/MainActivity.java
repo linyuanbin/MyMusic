@@ -1,10 +1,16 @@
 package com.lin.mymusic;
 
 import android.app.Activity;
+import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.os.Bundle;
 import android.telephony.PhoneStateListener;
@@ -25,8 +31,12 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 //Tools--> android-->Device monitor  音乐文件放入sd卡
@@ -44,7 +54,7 @@ import java.util.List;
  // 设置音乐播放完的监听
     mediaPlayer.setOnCompletionListener(this);
  */
-public class MainActivity extends Activity implements Runnable{
+public class MainActivity extends Activity{
 
     private static int p=0;
    // private EditText mEditText;
@@ -60,10 +70,12 @@ public class MainActivity extends Activity implements Runnable{
     private List<String> name;
     private ImageButton pauseButton;
     private AdapterViewFlipper mViewFlipper;
+    private TextView mStarTime;
+    private TextView mStopTime;
     int []iconId={R.mipmap.img_1,R.mipmap.img_2,R.mipmap.img_3,R.mipmap.img_4,R.mipmap.img_5,
             R.mipmap.img_6,R.mipmap.img_7,R.mipmap.img_8,R.mipmap.img_9};
-    private TextView textView_name;
 
+    private   Deque<MediaStore.Audio> data;
 
  /*   private  Handler handler;
     private Runnable updateThread;*/
@@ -82,9 +94,8 @@ public class MainActivity extends Activity implements Runnable{
         mSeekBar= (SeekBar) findViewById(R.id.seekbar);
         pauseButton= (ImageButton) findViewById(R.id.pause_button);
         mViewFlipper= (AdapterViewFlipper) findViewById(R.id.adapterviewflipper);
-        textView_name= (TextView) findViewById(R.id.text_name);
-
-
+        mStarTime= (TextView) findViewById(R.id.starTime);
+        mStopTime= (TextView) findViewById(R.id.stopTime);
 
 
         //mSpinner.setOnItemSelectedListener( new SpinnerListener());//点击监听
@@ -152,18 +163,19 @@ public class MainActivity extends Activity implements Runnable{
 
     } //onCreate
 
-    @Override
-    public void run() {
 
+    private String toTime(int time){  //将获取的歌曲时间毫秒转化为分钟
+        int minute = time / 1000 / 60;
+        int s = time / 1000 % 60;
+        String mm = null;
+        String ss = null;
+        if(minute<10)mm = "0" + minute;
+        else mm = minute + "";
+        if(s <10)ss = "0" + s;
+        else ss = "" + s;
+        return mm + ":" + ss;
     }
 
-    /*class SpinnerSelectedListener implements AdapterView.OnItemClickListener{
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            textView_name.setText(""+mArrayAdapter.getItem(i));
-        }
-    }*/
 
     class mMediaPlayersetOnCompletionListener implements MediaPlayer.OnCompletionListener{ //一首歌播放结束监听
 
@@ -193,7 +205,9 @@ public class MainActivity extends Activity implements Runnable{
         public void run() {
             //获得歌曲现在播放位置并设置成播放进度条的值
             int max=mSeekBar.getMax();
-            mSeekBar.setProgress((int)(max*(mMediaPlayer.getCurrentPosition()/(float) mMediaPlayer.getDuration())));
+            mSeekBar.setProgress((int)(max*(mMediaPlayer.getCurrentPosition()/(float) mMediaPlayer.getDuration())));//将歌曲进度转化为进度条进度
+            mStarTime.setText(toTime(mMediaPlayer.getCurrentPosition())); //设置进度时间
+            mStopTime.setText(toTime(mMediaPlayer.getDuration())); //设置最长时间
             //每次延迟100毫秒再启动线程
             handler.postDelayed(updateThread, 100); //单位毫秒
         }
@@ -233,7 +247,46 @@ public class MainActivity extends Activity implements Runnable{
 
 
     public void search(){
+        Cursor mAudioCursor = this.getContentResolver().query(  //android获取SQLLite里面的本地音乐清单
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                null,// 字段　没有字段　就是查询所有信息　相当于SQL语句中的　“ * ”
+                null, // 查询条件
+                null, // 条件的对应?的参数
+                MediaStore.Audio.AudioColumns.TITLE);// 排序方式
 
+        // 循环输出歌曲的信息
+        //List<Map<String, Object>> mListData = new ArrayList<Map<String, Object>>();
+        for (int i = 0; i < mAudioCursor.getCount(); i++) {
+            mAudioCursor.moveToNext();
+
+            // 找到歌曲标题和总时间对应的列索引
+ /*           int indexTitle = mAudioCursor
+                    .getColumnIndex(MediaStore.Audio.AudioColumns.TITLE);//歌名
+            int indexARTIST = mAudioCursor
+                    .getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST);//艺术家
+            int indexALBUM = mAudioCursor
+                    .getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM);//专辑
+            String strTitle = mAudioCursor.getString(indexTitle);//歌名
+            String strARTIST = mAudioCursor.getString(indexARTIST);//艺术家
+            String strALBUM = mAudioCursor.getString(indexALBUM);//专辑*/
+
+         /*  String tilte= mAudioCursor.getString(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)); //歌曲名称
+             String album= mAudioCursor.getString(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM)); //专辑名
+            int id= mAudioCursor.getInt(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)); //歌曲ID
+            float size= mAudioCursor.getLong(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)); //文件大小
+            int duration= mAudioCursor.getInt(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));//歌曲总播放时长
+            String artist= mAudioCursor.getString(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)); //歌手名*/
+            String filePath1=mAudioCursor.getString(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)); //得到歌曲路径
+            Log.i("路径--------》",filePath1);
+            list.add(filePath1);
+            String str=getFileName(filePath1);
+            String tilte= mAudioCursor.getString(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)); //歌曲名称
+            Log.i("str----->",tilte);
+            name.add(str); //保持歌曲名
+
+
+        }
+/*
         File[] file = Environment.getExternalStorageDirectory().listFiles();  //获取sd0卡目录所有文件
         if(file!=null) {
             for (int i=0;i<file.length;i++) {
@@ -249,6 +302,7 @@ public class MainActivity extends Activity implements Runnable{
                 Log.i("------>",list.get(j));
             }
         }
+        */
     }
 
     private final class MyPhoneListener extends PhoneStateListener{
