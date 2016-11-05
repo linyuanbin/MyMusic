@@ -277,7 +277,7 @@ public class MainActivity extends Activity{
             int duration= mAudioCursor.getInt(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));//歌曲总播放时长
             String artist= mAudioCursor.getString(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)); //歌手名*/
             String filePath1=mAudioCursor.getString(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)); //得到歌曲路径
-            Log.i("路径--------》",filePath1);
+            Log.i("路径-------->",filePath1);
             list.add(filePath1);
             String str=getFileName(filePath1);
             String tilte= mAudioCursor.getString(mAudioCursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)); //歌曲名称
